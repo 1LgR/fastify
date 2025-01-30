@@ -1,0 +1,36 @@
+fastify.get('/tarefas', async (request, reply) => {
+    return tarefas;
+})
+
+fastify.post('/tarefas', async (request, reply) =>{
+    const novaTarefa = {
+        id: tarefas.length + 1,
+        descricao: request.body.descricao,
+        feita: request.body.feita,
+    };
+    tarefas.push(novaTarefa);
+    return novaTarefa;
+});
+
+fastify.put('/tarefas/:id', async (request, reply) => {
+    const id = parseInt(request.params.id);
+    const tarefa = tarefas.find(t => t.id === id);
+    if (!tarefa) {
+        reply.code(404).send({ erro: 'Tarefa não encontrada' });
+        return;
+    }
+    tarefa.descricao = request.body.descricao|| tarefa.descricao;
+    tarefa.feita= request.body.feita !== undefined ?  request.body.feita : tarefa.feita;
+    return tarefa;
+});
+
+fastify.delete('/tarefas/:id', async (request, reply) => {
+    const id = parseInt(request.params.id);
+    const index = tarefas.findIndex(t => t.id === id);
+    if (index === -1) {
+        reply.code(404).send({ erro: 'Tarefa não encontrada' });
+        return;
+    }
+    tarefas.splice(index, 1);
+    return { message: 'Tarefa removida com sucesso' };
+});
